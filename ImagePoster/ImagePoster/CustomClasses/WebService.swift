@@ -33,7 +33,7 @@ class WebService {
         
     }
     
-    static func getResponsePost(url:String, parameters: [String : NSObject], inout response:String) -> Bool{
+    static func getResponsePost(url:String, parameters: [String : NSObject], inout response:String, customMessage:String! = nil) -> Bool{
         
         let jsonParameters = SBJsonWriter().stringWithObject(parameters)
     
@@ -47,7 +47,11 @@ class WebService {
         
         if request.responseStatusCode != 200 {
         
-            Utility.showAlert("Problem", message: "Cannot process now. Try later")
+            if customMessage != nil {
+                Utility.showAlert("Problem", message: customMessage)
+            }else{
+                Utility.showAlert("Problem", message: "Cannot process now. Try later")
+            }
             return false
             
         }
@@ -91,7 +95,7 @@ class WebService {
             let parameters = ["username" : userName, "password": password]
             var jsonResponse:String = ""
             
-            if WebService.getResponsePost(loginuserNamePassUrl, parameters: parameters, response: &jsonResponse) == true {
+            if WebService.getResponsePost(loginuserNamePassUrl, parameters: parameters, response: &jsonResponse, customMessage: "Invalid login credentials.") == true {
             
                 accessToken = JsonParser.parseLoginUserNamePass(jsonResponse)
                 return true
@@ -131,7 +135,14 @@ class WebService {
             
             if WebService.getResponsePost(registeruserNamePassUrl, parameters: parameters, response: &jsonResponse) == true {
                 
-                return true
+                if WebService.getResponsePost(loginuserNamePassUrl, parameters: parameters, response: &jsonResponse) == true {
+                    
+                    accessToken = JsonParser.parseLoginUserNamePass(jsonResponse)
+                    return true
+                    
+                }
+                Utility.showAlert("Problem", message: "Cannot process now. Try later")
+                return false
                 
             }
             

@@ -36,6 +36,9 @@ class RegisterViewController: BaseViewController {
         if WebService.registerUserNamePass(self.userNameTxt.text!, password: self.passwordTxt.text!, accessToken: &accessToken) == true {
             
             SVProgressHUD.dismiss()
+            Utility.saveObject(accessToken, key: "accessToken")
+            Utility.saveObject(self.userNameTxt.text!, key: "userName")
+            self.pushViewController("TutorialViewController")
             Utility.showAlert("Success", message: "Registration successfull.")
             
         }
